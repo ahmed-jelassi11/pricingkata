@@ -6,21 +6,29 @@ import java.util.Map;
 
 public class PricingRules {
 
-    private Map<ItemCode, BigDecimal> pricingRules;
+    private Map<ItemCode, PricingRule> pricingRules;
 
     public PricingRules() {
         this.pricingRules = new HashMap<>();
     }
 
-    public BigDecimal get(ItemCode itemCode) {
+    public BigDecimal getItemPrice(ItemCode itemCode) {
+        return this.getPricingRule(itemCode).getPrice();
+    }
+
+    public PricingRule getPricingRule(ItemCode itemCode){
         return this.pricingRules.get(itemCode);
     }
 
-    public void add(ItemCode itemCode, BigDecimal unitPrice) {
-        this.pricingRules.put(itemCode, unitPrice);
+    public void add(ItemCode itemCode, PricingRule pricingRule) {
+        this.pricingRules.put(itemCode, pricingRule);
     }
 
     public int size() {
         return pricingRules.size();
+    }
+
+    public boolean contains(ItemCode itemCode){
+        return pricingRules.containsKey(itemCode);
     }
 }
