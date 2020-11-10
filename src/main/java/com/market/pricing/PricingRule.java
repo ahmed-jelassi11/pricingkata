@@ -1,32 +1,78 @@
 package com.market.pricing;
 
+import com.market.pricing.offers.Offer;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
+/**
+ * Pricing Rule provide the handling
+ * the offer and the price of a given item
+ */
 public class PricingRule {
 
-    private final BigDecimal price;
-    private final Offer offer;
+    /**
+     * Used for storing the item's unit price
+     */
+    private BigDecimal unitPrice;
 
-    public PricingRule(BigDecimal price) {
-        this(price, Offer.noOffer(price));
+    /**
+     * Used for storing the item's offer
+     */
+    private Offer offer;
+
+    /**
+     * Constructor of a pricing rule without offer
+     * @param unitPrice
+     */
+    public PricingRule(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
-    public PricingRule(BigDecimal price, Offer offer) {
-        price.setScale(2, RoundingMode.HALF_UP);
-        this.price = price;
+    /**
+     * Construtor that accepts unit price and offer
+     * @param unitPrice
+     * @param offer
+     */
+    public PricingRule(BigDecimal unitPrice, Offer offer) {
+        unitPrice.setScale(2, RoundingMode.HALF_UP);
+        this.unitPrice = unitPrice;
         this.offer = offer;
     }
 
-        public BigDecimal priceForQuantity(int quantity) {
-        BigDecimal offerPrice = offer.getPrice();
-        int offerGroups = quantity / offer.getQuantity();
-        int outsideOffer = quantity % offer.getQuantity();
-        BigDecimal totalPrice = offerPrice.multiply(BigDecimal.valueOf(offerGroups)).add(price.multiply(BigDecimal.valueOf(outsideOffer)));
-        return totalPrice;
+    /**
+     * Accepts the item quantity and returns its total price
+     * @param quantity
+     * @return
+     */
+    public BigDecimal priceForQuantity(int quantity) {
+        return Optional.ofNullable(this.offer)
+                .map(offer -> offer.priceForQuantity(quantity, unitPrice))
+                .orElse(this.getUnitPrice().multiply(BigDecimal.valueOf(quantity)));
     }
 
-    public BigDecimal getPrice() {
-        return this.price;
+    /**
+     * apply discount by amount directly
+     * @param discount
+     */
+    public void applyAmountDiscount(BigDecimal discount) {
+        this.unitPrice = unitPrice.subtract(discount);
+    }
+
+    /**
+     * apply percentage discount to the pricing rule
+     * @param discount
+     */
+    public void applyPercentageDiscount(int discount) {
+        double percentage = (double) (100 - discount) / 100;
+        this.unitPrice = unitPrice.multiply(BigDecimal.valueOf(percentage));
+    }
+
+    /**
+     * @return unit price of the pricing rule
+     */
+    public BigDecimal getUnitPrice() {
+        return this.unitPrice;
     }
 }

@@ -2,6 +2,9 @@ package com.market.pricing;
 
 import java.util.Objects;
 
+/**
+ * the ItemCode class provides a wrapping layer of the Stirng item's code sequence
+ */
 public class ItemCode {
 
     private String itemCode;
