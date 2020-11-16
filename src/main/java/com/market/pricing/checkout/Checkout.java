@@ -15,18 +15,22 @@ public class Checkout {
 
     private PriceCalculator priceCalculator;
     private final Map<ItemCode, Integer> itemQuantities;
+    private final Map<ItemCode, Double> itemWeighings;
 
     /**
      * Trusted package private constructor accepting
+     *
      * @param priceCalculator handling the price calculation
      */
     Checkout(PriceCalculator priceCalculator) {
         this.priceCalculator = priceCalculator;
         this.itemQuantities = new HashMap<>();
+        this.itemWeighings = new HashMap<>();
     }
 
     /**
      * Scans and computes item quantity
+     *
      * @param itemCode
      */
     public void scan(ItemCode itemCode) {
@@ -37,11 +41,24 @@ public class Checkout {
     }
 
     /**
+     * Scans and computes item weighings
+     * @param itemCode
+     * @param weighings
+     */
+    public void scan(ItemCode itemCode, Double weighings) {
+        if (priceCalculator.getPricingRules().containsKey(itemCode)) {
+            itemWeighings.putIfAbsent(itemCode, 0d);
+            itemWeighings.compute(itemCode, (item, acutalWeighing) -> acutalWeighing + weighings);
+        }
+    }
+
+    /**
      * calculate the price of the actual scanned items
+     *
      * @return the total calculated price as {@code BigDecimal}
      */
-    public BigDecimal total(){
-        return priceCalculator.calculateTotalPrice(itemQuantities);
+    public BigDecimal total() {
+        return priceCalculator.calculateQuantitiesTotalPrice(itemQuantities).add(priceCalculator.calculateWeighingsTotalPrice(itemWeighings));
     }
 }
 

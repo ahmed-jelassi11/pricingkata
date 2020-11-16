@@ -69,6 +69,8 @@ public class CheckoutTest {
         ItemCode itemCode2 = new ItemCode("A2");
         ItemCode itemCode3 = new ItemCode("A3");
         ItemCode itemCode4 = new ItemCode("A4");
+        ItemCode itemCode5 = new ItemCode("A5");
+
         PriceCalculator priceCalculator = new PriceCalculator();
         priceCalculator.addPricingRule(itemCode1,
                 new PricingRule(BigDecimal.ONE, new SpecialOffer(3,2)));
@@ -82,6 +84,9 @@ public class CheckoutTest {
         priceCalculator.addPricingRule(itemCode4,
                 new PricingRule(BigDecimal.TEN));
         priceCalculator.getPricingRule(itemCode4).applyPercentageDiscount(30);
+
+        priceCalculator.addPricingRule(itemCode5,
+                new PricingRule(BigDecimal.TEN));
 
         Checkout checkout = new Checkout(priceCalculator);
         checkout.scan(itemCode1);
@@ -105,6 +110,11 @@ public class CheckoutTest {
 
         checkout.scan(itemCode4);
         assertEquals(25d, checkout.total().doubleValue());
+
+        checkout.scan(itemCode5, 0.6);
+        checkout.scan(itemCode5, 0.9);
+
+        assertEquals(40d, checkout.total().doubleValue());
 
     }
 

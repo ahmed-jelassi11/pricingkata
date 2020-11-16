@@ -25,6 +25,7 @@ public class PriceCalculator {
 
     /**
      * Returns the item unit price by
+     *
      * @param itemCode
      */
     public BigDecimal getItemPrice(ItemCode itemCode) {
@@ -33,23 +34,24 @@ public class PriceCalculator {
 
     /**
      * Returns the pricing rule by
+     *
      * @param itemCode
      */
-    public PricingRule getPricingRule(ItemCode itemCode){
+    public PricingRule getPricingRule(ItemCode itemCode) {
         return this.pricingRules.get(itemCode);
     }
 
     /**
-     *
      * @return all the registred pricing rules
      * as {@code Map}
      */
-    public Map<ItemCode, PricingRule> getPricingRules(){
+    public Map<ItemCode, PricingRule> getPricingRules() {
         return this.pricingRules;
     }
 
     /**
      * Adds pricing rule for an item
+     *
      * @param itemCode
      * @param pricingRule
      */
@@ -59,10 +61,11 @@ public class PriceCalculator {
 
     /**
      * Calculate total items price based on
+     *
      * @param itemQuantities
      * @return total price as  {@code BigDecimal}
      */
-    public BigDecimal calculateTotalPrice(Map<ItemCode, Integer> itemQuantities) {
+    public BigDecimal calculateQuantitiesTotalPrice(Map<ItemCode, Integer> itemQuantities) {
         return itemQuantities
                 .entrySet()
                 .stream()
@@ -71,7 +74,32 @@ public class PriceCalculator {
     }
 
     /**
+     * Calculate total items price based on
+     *
+     * @param itemWeighings
+     * @return total price as  {@code BigDecimal}
+     */
+    public BigDecimal calculateWeighingsTotalPrice(Map<ItemCode, Double> itemWeighings) {
+        return itemWeighings
+                .entrySet()
+                .stream()
+                .map(this::priceForItem)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    /**
+     * Calculate item price based on its weighings
+     * @param itemCodeDoubleEntry
+     * @return
+     */
+    private BigDecimal priceForItem(Map.Entry<ItemCode, Double> itemCodeDoubleEntry) {
+        PricingRule pricingRule = this.getPricingRule(itemCodeDoubleEntry.getKey());
+        return pricingRule.getUnitPrice().multiply(BigDecimal.valueOf(itemCodeDoubleEntry.getValue()));
+    }
+
+    /**
      * Calculates total price for a specific item
+     *
      * @param itemsEntry
      * @return
      */
